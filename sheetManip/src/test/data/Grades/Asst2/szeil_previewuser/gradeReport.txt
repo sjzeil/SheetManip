@@ -1,0 +1,6 @@
+A sample grade report.
+
+Compilation: 10/10
+Tests:       80/90
+Total:       90/100
+

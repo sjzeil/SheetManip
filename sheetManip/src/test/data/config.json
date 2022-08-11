@@ -1,0 +1,29 @@
+{
+  "lmsType": "Blackboard",
+  "lmsCourseID": "_248057_1",
+  "LMSuRL": "https://www.blackboard.odu.edu/",
+  "gradeSpreadsheet": {
+    "path": "target/sampleCourse.xls"
+  },
+  "sheetNameForDownloads": "lmsDownload",
+  "sheetNameForUploads": "lmsUpload",
+  "sheetNameForGrades": "collectedGrades",
+  "sheetNameForRoster": "roster",
+  "enrollmentRecords": {
+    "path": "src/test/data/enroll.new"
+  },
+  "courseCRNs": [
+    "18387",
+    "18389",
+    "18390"
+  ],
+  "gradesDir": {
+    "path": "src/test/data/Grades"
+  },
+  "lmsLogin": "szeil",
+  "lmsPassword": "",
+  "scorePattern": {
+    "pattern": "Total:",
+    "flags": 0
+  }
+}

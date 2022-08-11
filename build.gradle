@@ -1,0 +1,34 @@
+
+
+allprojects {
+    group='edu.odu.cs.zeil'
+	version='1.6'
+}
+
+
+subprojects {
+    subproject ->  
+	        //apply plugin: 'edu.odu.cs.zeil.report_accumulator'
+
+    // Credentials are loaded from ~/.gradle/gradle.properties
+    if(project.hasProperty("ivyRepoUser")){
+        ext.ivyRepoUser = "$ivyRepoUser";
+    } else {
+        ext.ivyRepoUser = "user";
+    }
+    if(project.hasProperty("ivyRepoPass")){
+        ext.ivyRepoPass = "$ivyRepoPass";
+    } else {
+        ext.ivyRepoPass = "password";
+    }
+
+
+	repositories {
+        jcenter()
+        ivy { // for report-accumulator
+		    url 'https://www.cs.odu.edu/~zeil/ivyrepo'
+	    }
+    }
+
+ }
+
