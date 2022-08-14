@@ -768,7 +768,6 @@ public class Spreadsheet {
 	public void injectProperties(Properties properties,
 	        String leftDelimiter, String rightDelimiter) {
 
-	    FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
 	    for (int i = 0; i < wb.getNumberOfSheets(); i++) {
 	        Sheet sheet = wb.getSheetAt(i);
 	        int rowEnd = sheet.getLastRowNum();
@@ -841,4 +840,83 @@ public class Spreadsheet {
         }
         return results;
     }
+
+
+    /**
+     * Renders a sheet as an HTML table.
+     *  
+     * @param sheetName the name of the sheet from which to obtain the data.
+     * @param  skipInvalidDataRows if true, omit any row containing a non-empty
+     *                             value that is not a valid number or string.
+     * @param row1Prefix string to place in front of each value in row 1,
+     *      e.g., "<b>"
+     * @param row1Suffix string to place after each value in row 1,
+     *      e.g., "</b>"
+     * @param colAPrefix string to place in front of each value in column A,
+     *      in rows > 1, e.g., "<i>"
+     * @param colASuffix string to place after each value in column A,
+     *      in rows > 1, e.g., "</i>"
+     * @return the text of an HTML table containing the values from the
+     *          selected sheet.
+     * @throws IOException 
+     * @throws InvalidFormatException 
+     * @throws EncryptedDocumentException 
+     */
+    public String sheet2HTML(
+            final String sheetName,
+            boolean skipInvalidDataRows,
+            String row1Prefix,
+            String row1Suffix,
+            String colAPrefix,
+            String colASuffix
+            ) 
+        throws EncryptedDocumentException, InvalidFormatException, IOException {
+
+        List<String[]> contents = evaluateSheet(
+                sheetName, 
+                skipInvalidDataRows);
+
+        StringBuilder out = new StringBuilder();
+        out.append("<table border='1'>\n");
+        int rowNum = 0;
+        for (String[] row: contents) {
+            out.append("<tr>");
+            for (int col = 0; col < row.length; ++col) {
+                String prefix = (rowNum == 0) ? row1Prefix 
+                    : ((col == 0) ? colAPrefix : "");
+                out.append("<td>");
+                out.append(prefix);
+                String suffix = (rowNum == 0) ? row1Suffix 
+                    : ((col == 0) ? colASuffix : "");
+                String value = row[col];
+                if (value == null) {
+                    value = "";
+                }
+                boolean isANumber = false;
+                try {
+                    Double.parseDouble(value);
+                    isANumber = true;
+                } catch (NumberFormatException ex) {
+                    isANumber = false;
+                }
+                if (isANumber && value.endsWith(".0")) {
+                    value = value.substring(0, value.length()-2);
+                }
+                if (value.contains("\n") || value.contains("\r")) {
+                    value = "\n<pre>" + value + "</pre>\n";
+                }
+                out.append(value);
+                out.append(suffix);
+                out.append("</td>");
+            }
+            out.append("</tr>\n");
+            ++rowNum;
+        }
+        out.append("</table>\n");
+        return out.toString();
+    }
+
+
+
+
 }

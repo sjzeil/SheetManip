@@ -15,8 +15,15 @@ import java.util.List;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 
 /**
@@ -352,4 +359,22 @@ public class TestSpreadSheet {
         ss.close();
 
     }
+
+    @Test
+    public void testSheet2HTML() throws EncryptedDocumentException, InvalidFormatException, IOException {
+        Spreadsheet ss = new Spreadsheet(testXLSFile);
+
+        String htmlTable = ss.sheet2HTML("out", true, 
+            "<b>", "</b>", "<i>", "</i>");
+
+        assertThat (htmlTable, containsString("<table"));
+        assertThat (htmlTable, containsString("</table>"));
+        assertThat (htmlTable, containsString("<b>Column 2.</b>"));
+        assertThat (htmlTable, containsString("<i>Row 4.</i>"));
+        assertThat (htmlTable, containsString("<td>9</td>"));
+        
+        ss.close();
+
+    }
+
 }

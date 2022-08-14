@@ -16,7 +16,8 @@ dependencies {
     implementation 'org.apache.poi:poi-ooxml:5.2.2'
     implementation 'com.opencsv:opencsv:3.4+'
     implementation 'commons-logging:commons-logging:1.2+'
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+	testImplementation 'org.hamcrest:hamcrest-library:2.2'
 }
 
 test {
