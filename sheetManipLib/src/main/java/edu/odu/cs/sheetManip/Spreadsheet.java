@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -827,7 +828,9 @@ public class Spreadsheet {
 	 * @param lrRow  row of lower right corner of region to clear
 	 * @param lrCol  column of lower right corner of region to clear
 	 */
-    public void clear(String sheetName, int ulRow, int ulCol, int lrRow, int lrCol) {
+    public void clear(String sheetName, 
+            int ulRow, int ulCol,
+            int lrRow, int lrCol) {
         Sheet sheet = wb.getSheet(sheetName);
 
         for (int rowNum = ulRow; rowNum <= lrRow; ++rowNum) {
@@ -840,5 +843,18 @@ public class Spreadsheet {
             }
         }
         saveWorkBook(wb);
+    }
+
+
+    /**
+     * @return a list of the names of all sheets in the spreadsheet file.
+     */
+    public List<String> getSheetNames() {
+        List<String> results = new ArrayList<>();
+        for (Sheet sheet: wb) {
+            String name = sheet.getSheetName();
+            results.add(name);
+        }
+        return results;
     }
 }

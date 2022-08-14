@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -337,4 +339,17 @@ public class TestSpreadSheet {
         }
     }
 
+    @Test
+    public void testListSheets() throws EncryptedDocumentException, InvalidFormatException, IOException {
+        Spreadsheet ss = new Spreadsheet(testXLSFile);
+        List<String> sheets = ss.getSheetNames();
+
+        String[] expected = {"in", "work", "out",
+            "merge"};
+
+        assertIterableEquals(sheets, Arrays.asList(expected));
+        
+        ss.close();
+
+    }
 }
