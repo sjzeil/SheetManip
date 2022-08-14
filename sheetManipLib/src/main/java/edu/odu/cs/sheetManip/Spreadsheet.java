@@ -14,7 +14,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -127,21 +126,6 @@ public class Spreadsheet {
     }
 
 
-    /*
-    private String getStringValue(Row ssrow, int colNum) {
-        Cell c = ssrow.getCell(colNum);
-        if (c != null) {
-            int cellType = c.getCellType();
-            if (cellType == CellType.STRING) {
-                return c.getStringCellValue();
-            } else {
-                return "";
-            }
-        } else {
-            return "";
-        }
-    }
-     */
 
     /**
      * Removes all data entries from a sheet.
@@ -360,11 +344,11 @@ public class Spreadsheet {
         int rowEnd = sheet.getLastRowNum();
         int lastFilledRow = -1; 
         for (int rowNum = 0; rowNum <= rowEnd; ++rowNum) {
-            Row ssrow = sheet.getRow(rowNum);
-            int lastCol = (ssrow == null) ? 0 : Math.max(ssrow.getLastCellNum(), 0);
+            Row ssRow = sheet.getRow(rowNum);
+            int lastCol = (ssRow == null) ? 0 : Math.max(ssRow.getLastCellNum(), 0);
             if (lastCol < keyColumn) continue;
 
-            Cell c = ssrow.getCell(keyColumn);
+            Cell c = ssRow.getCell(keyColumn);
             if (c == null) continue;
             
             CellType cellType = c.getCellType();
@@ -475,15 +459,15 @@ public class Spreadsheet {
 
         int rowEnd = fromSheet.getLastRowNum();
         for (int rowNum = 0; rowNum <= rowEnd; ++rowNum) {
-            Row ssrow = fromSheet.getRow(rowNum);
-            if (ssrow == null) continue; 
+            Row ssRow = fromSheet.getRow(rowNum);
+            if (ssRow == null) continue; 
             Row intoRow = intoSheet.getRow(rowNum);
             if (intoRow == null) {
                 intoRow = intoSheet.createRow(rowNum);
             }
-            int lastCol = (ssrow == null) ? 0 : Math.max(ssrow.getLastCellNum(), 0);
+            int lastCol = (ssRow == null) ? 0 : Math.max(ssRow.getLastCellNum(), 0);
             for (int colNum = 0; colNum < lastCol; ++colNum) {
-                Cell c = ssrow.getCell(colNum);
+                Cell c = ssRow.getCell(colNum);
                 if (c == null) continue;
                 CellType ctype = c.getCellType();
                 switch (ctype) {
@@ -544,13 +528,13 @@ public class Spreadsheet {
         int rowEnd = sheet.getLastRowNum();
         List<String[]> csvContents = new ArrayList<String[]>();
         for (int rowNum = 0; rowNum <= rowEnd; ++rowNum) {
-            Row ssrow = sheet.getRow(rowNum);
-            int lastCol = (ssrow == null) ? 0 : Math.max(ssrow.getLastCellNum(), 0);
+            Row ssRow = sheet.getRow(rowNum);
+            int lastCol = (ssRow == null) ? 0 : Math.max(ssRow.getLastCellNum(), 0);
             String[] row = new String[lastCol];
             boolean rowIsValid = true;
             boolean rowIsEmpty = true;
             for (int colNum = 0; colNum < lastCol; ++colNum) {
-                Cell c = ssrow.getCell(colNum);
+                Cell c = ssRow.getCell(colNum);
                 FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
                 String value = "";
                 if (c != null) {
@@ -624,10 +608,10 @@ public class Spreadsheet {
         int rowEnd = sheet.getLastRowNum();
         Set<String> studentNames = new TreeSet<String>();
         for (int rowNum = 1; rowNum <= rowEnd; ++rowNum) {
-            Row ssrow = sheet.getRow(rowNum);
-            int lastCol = (ssrow == null) ? -1 : ssrow.getLastCellNum();
+            Row ssRow = sheet.getRow(rowNum);
+            int lastCol = (ssRow == null) ? -1 : ssRow.getLastCellNum();
             if (lastCol >= studentNameColNumber) {
-                Cell c = ssrow.getCell(studentNameColNumber);
+                Cell c = ssRow.getCell(studentNameColNumber);
                 String name = evaluateCell(c, wb).trim();
                 if (name.length() > 0) {
                     studentNames.add(name);
@@ -646,18 +630,18 @@ public class Spreadsheet {
             int nRows = 0;
 
             for (int rowNum = 0; rowNum <= rowEnd; ++rowNum) {
-                Row ssrow = sheet.getRow(rowNum);
+                Row ssRow = sheet.getRow(rowNum);
                 String idValue = "";
-                int lastCol = (ssrow == null) ? -1 : ssrow.getLastCellNum();
+                int lastCol = (ssRow == null) ? -1 : ssRow.getLastCellNum();
                 if (lastCol >= studentNameColNumber) {
-                    Cell c = ssrow.getCell(studentNameColNumber);
+                    Cell c = ssRow.getCell(studentNameColNumber);
                     idValue = evaluateCell(c, wb).trim();
                 }
                 if (idValue.length() == 0 || idValue.equals(studentName)) {
                     // Copy this row into the student spreadsheet
                     Row studentRow = gradesSheet.createRow(nRows);
                     for (int col = 0; col <= lastCol; ++col) {
-                        Cell c = ssrow.getCell(col);
+                        Cell c = ssRow.getCell(col);
                         if (c != null) {
                             String value = evaluateCell(c, wb);
                             Cell cNew = studentRow.createCell(col, CellType.STRING);
@@ -666,7 +650,7 @@ public class Spreadsheet {
                     }
 
                     if (lastCol >= totalsColNumber) {
-                        Cell c = ssrow.getCell(totalsColNumber);
+                        Cell c = ssRow.getCell(totalsColNumber);
                         totalValue = evaluateCell(c, wb).trim();
                     }   
                     ++nRows;
@@ -771,37 +755,37 @@ public class Spreadsheet {
 
 	/**
 	 * Scans the spreadsheet for cells containing strings of the form
-	 * leftDelimiter + pname + rightDelimiter, where name pname is the name
+	 * leftDelimiter + pName + rightDelimiter, where name pName is the name
 	 * of a property in properties.   Replaces the value of any such cell by
 	 * the value of that property. If the value can be parsed as a number, the
 	 * cell is set to numeric. otherwise the property value is inserted as a
 	 * string.
 	 * 
 	 * @param properties  a collection of named properties
-	 * @param leftDelimeter string to expect to the left of a property name
+	 * @param leftDelimiter string to expect to the left of a property name
 	 * @param rightDelimiter string to expect to the right of a property name
 	 */
 	public void injectProperties(Properties properties,
-	        String leftDelimeter, String rightDelimiter) {
+	        String leftDelimiter, String rightDelimiter) {
 
 	    FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
 	    for (int i = 0; i < wb.getNumberOfSheets(); i++) {
 	        Sheet sheet = wb.getSheetAt(i);
 	        int rowEnd = sheet.getLastRowNum();
 	        for (int rowNum = 0; rowNum <= rowEnd; ++rowNum) {
-	            Row ssrow = sheet.getRow(rowNum);
-	            int lastCol = (ssrow == null) ? 0 : Math.max(ssrow.getLastCellNum(), 0);
+	            Row ssRow = sheet.getRow(rowNum);
+	            int lastCol = (ssRow == null) ? 0 : Math.max(ssRow.getLastCellNum(), 0);
 	            for (int colNum = 0; colNum < lastCol; ++colNum) {
-	                Cell cell = ssrow.getCell(colNum);
+	                Cell cell = ssRow.getCell(colNum);
 	                if (cell == null) continue;
 	                if (cell.getCellType() != CellType.STRING) continue;
-	                String pname = cell.getStringCellValue();
-	                if (pname.startsWith(leftDelimeter) 
-	                        && pname.endsWith(rightDelimiter)) {
-	                    pname = pname.substring(leftDelimeter.length());
-	                    pname = pname.substring(0,
-	                            pname.length() - rightDelimiter.length());
-	                    String value = properties.getProperty(pname);
+	                String pName = cell.getStringCellValue();
+	                if (pName.startsWith(leftDelimiter) 
+	                        && pName.endsWith(rightDelimiter)) {
+	                    pName = pName.substring(leftDelimiter.length());
+	                    pName = pName.substring(0,
+	                            pName.length() - rightDelimiter.length());
+	                    String value = properties.getProperty(pName);
 	                    if (value != null) {
 	                        try {
 	                            double d = Double.parseDouble(value);
@@ -834,12 +818,12 @@ public class Spreadsheet {
         Sheet sheet = wb.getSheet(sheetName);
 
         for (int rowNum = ulRow; rowNum <= lrRow; ++rowNum) {
-            Row ssrow = sheet.getRow(rowNum);
-            if (ssrow == null) continue; 
+            Row ssRow = sheet.getRow(rowNum);
+            if (ssRow == null) continue; 
             for (int colNum = ulCol; colNum <= lrCol; ++colNum) {
-                Cell c = ssrow.getCell(colNum);
+                Cell c = ssRow.getCell(colNum);
                 if (c == null) continue;
-                ssrow.removeCell(c);
+                ssRow.removeCell(c);
             }
         }
         saveWorkBook(wb);
