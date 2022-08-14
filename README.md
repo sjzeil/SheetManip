@@ -3,6 +3,8 @@
 A collection of tools for manipulating Excel spreadsheets and CSV
  files.
 
+Current version: 1.7
+
 Project reports are ...
 
 * `sheetManipLib`: A library of routines for extracting/inserting 

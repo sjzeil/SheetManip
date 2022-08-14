@@ -862,7 +862,7 @@ public class Spreadsheet {
      * @throws InvalidFormatException 
      * @throws EncryptedDocumentException 
      */
-    public String sheet2HTML(
+    public String sheetToHTML(
             final String sheetName,
             boolean skipInvalidDataRows,
             String row1Prefix,
@@ -903,7 +903,9 @@ public class Spreadsheet {
                     value = value.substring(0, value.length()-2);
                 }
                 if (value.contains("\n") || value.contains("\r")) {
-                    value = "\n<pre>" + value + "</pre>\n";
+                    value = "\n<pre>" + htmlSafe(value) + "</pre>\n";
+                } else {
+                    value = htmlSafe(value);
                 }
                 out.append(value);
                 out.append(suffix);
@@ -917,6 +919,64 @@ public class Spreadsheet {
     }
 
 
+    /**
+     * Provides an HTML summary of the entire spreadsheet.
+     * @param title title for the page.
+     * @param  skipInvalidDataRows if true, omit any row containing a non-empty
+     *                             value that is not a valid number or string.
+     * @param row1Prefix string to place in front of each value in row 1,
+     *      e.g., "<b>"
+     * @param row1Suffix string to place after each value in row 1,
+     *      e.g., "</b>"
+     * @param colAPrefix string to place in front of each value in column A,
+     *      in rows > 1, e.g., "<i>"
+     * @param colASuffix string to place after each value in column A,
+     *      in rows > 1, e.g., "</i>"
+     * @return the text of an HTML table containing the values from the
+     *          selected sheet.
+     * @throws IOException 
+     * @throws InvalidFormatException 
+     * @throws EncryptedDocumentException 
+     * @return a complete HTML page containing a table for each sheet.
+     */
+    public String toHTML(
+            final String title,
+            boolean skipInvalidDataRows,
+            final String row1Prefix,
+            final String row1Suffix,
+            final String colAPrefix,
+            final String colASuffix
+            ) 
+        throws EncryptedDocumentException, InvalidFormatException, IOException {
 
+        StringBuilder out = new StringBuilder();
+        out.append ("<html>\n<head>\n<title>");
+        out.append (htmlSafe(title));
+        out.append ("</title>\n</head>\n<body><h1>");
+        out.append (htmlSafe(title));
+        out.append("</h1>\n");
 
+        List<String> sheetNames = getSheetNames();
+
+        for (String sheetName: sheetNames) {
+            String table = sheetToHTML(sheetName, skipInvalidDataRows, 
+                row1Prefix, row1Suffix, colAPrefix, colASuffix);
+            out.append("<h2>" + htmlSafe(sheetName) + "</h2>\n");
+            out.append(table);
+        }
+        out.append("\n</body>\n</html>\n");
+        return out.toString();
+}
+
+    /**
+     * Make a string "HTML safe" by encoding &, <, and > characters.
+     * @param str a string intended for injection into an HTML page.
+     * @return encoded version of str
+     */
+    private String htmlSafe(String title) {
+        String result = title.replace("&", "&amp;");
+        result = result.replace("<", "&lt;");
+        result = result.replace(">", "&gt;");
+        return result;
+    }
 }

@@ -364,7 +364,7 @@ public class TestSpreadSheet {
     public void testSheet2HTML() throws EncryptedDocumentException, InvalidFormatException, IOException {
         Spreadsheet ss = new Spreadsheet(testXLSFile);
 
-        String htmlTable = ss.sheet2HTML("out", true, 
+        String htmlTable = ss.sheetToHTML("out", true, 
             "<b>", "</b>", "<i>", "</i>");
 
         assertThat (htmlTable, containsString("<table"));
@@ -376,5 +376,39 @@ public class TestSpreadSheet {
         ss.close();
 
     }
+
+    @Test
+    public void testToHTML() throws EncryptedDocumentException, InvalidFormatException, IOException {
+        Spreadsheet ss = new Spreadsheet(testXLSFile);
+
+        String htmlPage = ss.toHTML("Main title", true,
+            "<b>", "</b>", "<i>", "</i>");
+
+        assertThat(htmlPage, 
+            containsString("<title>Main title</title>"));
+        assertThat(htmlPage, 
+            containsString("<h1>Main title</h1>"));
+        assertThat(htmlPage, 
+            containsString("<h2>in</h2>"));
+        assertThat(htmlPage, 
+            containsString("<h2>work</h2>"));
+        assertThat(htmlPage, 
+            containsString("<h2>out</h2>"));
+        assertThat(htmlPage, 
+            containsString("<h2>merge</h2>"));
+        
+        assertThat (htmlPage, containsString("<table"));
+        assertThat (htmlPage, containsString("</table>"));
+        assertThat (htmlPage, containsString("<b>Column 2.</b>"));
+        assertThat (htmlPage, containsString("<i>Row 4.</i>"));
+        assertThat (htmlPage, containsString("<td>9</td>"));
+        
+        ss.close();
+
+    }
+
+
+
+
 
 }

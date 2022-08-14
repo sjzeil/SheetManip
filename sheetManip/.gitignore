@@ -1,3 +1,8 @@
 /.classpath
 **/build/
 .gradle/
+**/.class
+**/bin/
+.settings/
+.vscode/
+**/~*.xlsx
