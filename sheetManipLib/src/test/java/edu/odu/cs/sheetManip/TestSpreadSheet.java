@@ -9,12 +9,21 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 
 /**
@@ -336,5 +345,70 @@ public class TestSpreadSheet {
             ss.close();
         }
     }
+
+    @Test
+    public void testListSheets() throws EncryptedDocumentException, InvalidFormatException, IOException {
+        Spreadsheet ss = new Spreadsheet(testXLSFile);
+        List<String> sheets = ss.getSheetNames();
+
+        String[] expected = {"in", "work", "out",
+            "merge"};
+
+        assertIterableEquals(sheets, Arrays.asList(expected));
+        
+        ss.close();
+
+    }
+
+    @Test
+    public void testSheet2HTML() throws EncryptedDocumentException, InvalidFormatException, IOException {
+        Spreadsheet ss = new Spreadsheet(testXLSFile);
+
+        String htmlTable = ss.sheetToHTML("out", true, 
+            "<b>", "</b>", "<i>", "</i>");
+
+        assertThat (htmlTable, containsString("<table"));
+        assertThat (htmlTable, containsString("</table>"));
+        assertThat (htmlTable, containsString("<b>Column 2.</b>"));
+        assertThat (htmlTable, containsString("<i>Row 4.</i>"));
+        assertThat (htmlTable, containsString("<td>9</td>"));
+        
+        ss.close();
+
+    }
+
+    @Test
+    public void testToHTML() throws EncryptedDocumentException, InvalidFormatException, IOException {
+        Spreadsheet ss = new Spreadsheet(testXLSFile);
+
+        String htmlPage = ss.toHTML("Main title", true,
+            "<b>", "</b>", "<i>", "</i>");
+
+        assertThat(htmlPage, 
+            containsString("<title>Main title</title>"));
+        assertThat(htmlPage, 
+            containsString("<h1>Main title</h1>"));
+        assertThat(htmlPage, 
+            containsString("<h2>in</h2>"));
+        assertThat(htmlPage, 
+            containsString("<h2>work</h2>"));
+        assertThat(htmlPage, 
+            containsString("<h2>out</h2>"));
+        assertThat(htmlPage, 
+            containsString("<h2>merge</h2>"));
+        
+        assertThat (htmlPage, containsString("<table"));
+        assertThat (htmlPage, containsString("</table>"));
+        assertThat (htmlPage, containsString("<b>Column 2.</b>"));
+        assertThat (htmlPage, containsString("<i>Row 4.</i>"));
+        assertThat (htmlPage, containsString("<td>9</td>"));
+        
+        ss.close();
+
+    }
+
+
+
+
 
 }
