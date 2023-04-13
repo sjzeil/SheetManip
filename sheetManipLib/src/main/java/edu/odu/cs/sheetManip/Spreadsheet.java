@@ -746,7 +746,12 @@ public class Spreadsheet {
             FileOutputStream fileOut = new FileOutputStream(studentSSFile);
             studentWB.write(fileOut);
             fileOut.close();
-            studentWB.close();
+            try {
+                studentWB.close();
+            } catch (IOException e) {
+                log.error("Possible problem closing spreadsheet "
+                    + studentSSFile + ": " + e.getMessage());
+            }
             studentSSTemp.delete();
         }
 
